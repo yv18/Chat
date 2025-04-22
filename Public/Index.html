@@ -1,426 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What's App</title>
-    <style>
-        body {
-             background-color: #F3F3F3;
-         }
-
-nav {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: 5px;
-}
-
-
-.main-container {
-   display: flex;
-   justify-content: start;
-   align-items: center;
-   width: 100%;
-   gap: 10px;
-}
-
-.sidebar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-    width: 5% !important;
-    height: 90vh;
-}
-
-.sidebar div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.sidebar img {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-}
-
-.m10 {
-    margin-top: 10px;
-}
-
-
-.chatlist {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    width: 100% !important;
-    height: 90vh;
-    background-color: white;
-    border-radius: 10px;
-}
-
-
-.list {
-    display: flex;
-    justify-content: baseline;
-    align-items: center;
-    flex-direction: column;
-    width: 30% !important;
-    height: 90vh;
-    border-right: 1px solid gainsboro;
-}
-
-
-
-
-.header-chat {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.search-chat {
-    width: 100%;
-}
-
-.search {
-    padding: 8px;
-    width: 90%;
-    margin-left: 10px;
-    margin-right: 10px;
-    border: 1px solid gainsboro;
-    border-radius: 5px;
-}
-
-
-.user-profile {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    width: 95%;
-    height: 60px;
-    margin: 10px;
-    background-color: #F3F3F3;
-    border-radius: 5px;
-}
-
-
-.user-profile1 {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    width: 95%;
-    height: 60px;
-    margin: 10px;
-    background-color: white;
-    border-radius: 5px;
-}
-
-.user-content {
-    display: flex;
-    justify-content: baseline;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 10px;
-    margin-left: 10px;
-    color: black;
-}
-
-
-.txt {
-    position: relative;
-    bottom: 30px;
-    right: 15px;
-    color: rgb(125, 122, 122);
-}
-
-
-
-.chat {
-    background-image: url('/Images/WP-Back.jpg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-    width: 70% !important;
-    height: 90vh;
-    background-color: white;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-
-
-.user-chat-profile {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: 10px;
-    margin-left: 10px;
-    width: 100%;
-}
-
-.header-chat-profile {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    background-color: white;
-    height: 70px;
-}
-
-.header-chat-profile i {
-    margin-right: 20px;
-}
-
-
-.type {
-    display: flex;
-    position: relative;
-    width: 100%;
-    bottom: 20px;
-    left: 4px;
-}
-
-.name {
-    overflow: hidden;
-    width: 100%;
-}
-
-
-.chat-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-    height: 50px;
-    width: 100% !important;
-    gap: 20px;
-}
-
-.chat-box form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-.chat-box  input {
-    border: none;
-    padding: 10px;    
-}
-
-
-#btn {
-    background-color: white;
-    border: none;
-}
-      
-
-        .sender-message {
-          width: 90% !important;
-          text-align: right;
-          color: black;
-          list-style: none;
-          padding: 10px;
-          background-color: rgb(72, 192, 72);
-          border-radius: 10px;
-        }
-
-
-
-        .receiver-message {
-          width: 90% !important;
-          text-align: left;
-          color: black;
-          list-style: none;
-          padding: 10px;
-          background-color: aliceblue;
-          border-radius: 10px;
-        }
-      </style>
-      <script src="/socket.io/socket.io.js"></script>
-      <script>
-        const socket = io();
-        let typingTimer;
-        const typingTimeout = 1000; // milliseconds
-    
-        function sendMessage() {
-          const message = document.getElementById('message').value;
-          const sender = document.getElementById('sender').value;
-          if (!sender) {
-            alert('Please enter your name.');
-            return false;
-          }
-          socket.emit('chat message', { sender, message });
-          clearTimeout(typingTimer); // Stop typing indicator when message is sent
-          document.getElementById('message').value = '';
-          document.getElementById('typing-indicator').textContent = ''; // Clear typing indicator
-          return false;
-        }
-    
-        function startTyping() {
-          const message = document.getElementById('message').value;
-          const sender = document.getElementById('sender').value;
-          socket.emit('typing', { sender, message });
-          clearTimeout(typingTimer);
-        }
-    
-        function stopTyping() {
-          const sender = document.getElementById('sender').value;
-          typingTimer = setTimeout(() => {
-            socket.emit('stop typing', sender);
-          }, typingTimeout);
-        }
-    
-        socket.on('chat message', function(data){
-          const messages = document.getElementById('messages');
-          const li = document.createElement('li');
-          li.className = data.sender === document.getElementById('sender').value ? 'sender-message' : 'receiver-message';
-          li.textContent = data.sender + ': ' + data.message;
-          messages.appendChild(li);
-        });
-    
-        socket.on('typing', function(data){
-          const typingIndicator = document.getElementById('typing-indicator');
-          typingIndicator.textContent = data.sender + ' is typing: ' + data.message;
-        });
-    
-        socket.on('stop typing', function(sender){
-          const typingIndicator = document.getElementById('typing-indicator');
-          typingIndicator.textContent = '';
-        });
-    
-        // Prompt the user to enter their name when the page is loaded
-        window.onload = function() {
-          const sender = prompt('Please enter your name:');
-          if (sender) {
-            document.getElementById('sender').value = sender;
-          }
-        };
-    
-      </script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glass Chat App</title>
+  <style>
+    .custom-input::placeholder {
+        color: gray;
+        opacity: 1;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
-<body>
-    <header>
-        <nav>
-                <img src="/Images/logo.png" height="40" width="40" alt="WhatApp"/>
-                <h3>WhatsApp</h3>
-        </nav>
-    </header>
+<body class="bg-gradient-to-br from-purple-300 via-pink-300 to-blue-300 min-h-screen flex items-center justify-center p-4 font-sans">
 
-    <div class="main-container">
-        <div class="sidebar">
-            <div>
-                <span><i class="fab fa-rocketchat m10"></i></span>
-                <span><i class="fas fa-phone-alt"></i></span>
-                <span><i class="far fa-circle"></i></span>
-            </div>
-            <div>
-                <span><i class="far fa-star"></i></span>
-                <span><i class="fas fa-archive"></i></span>
-                <span><i class="fas fa-cog"></i></span>
-                <img src="/Images/Vk.jpg" alt="dp">
-            </div>
-           
+  <div class="w-full max-w-6xl h-[90vh] flex backdrop-blur-xl bg-white/30 rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Sidebar -->
+    <div class="hidden md:flex w-1/3 flex-col p-4 border-r border-white/20">
+      <h2 class="text-white text-2xl font-semibold mb-4">Contacts</h2>
+      <div class="flex items-center gap-3 mb-4 bg-white/20 p-3 rounded-xl hover:bg-white/30 cursor-pointer transition">
+        <img src="Images/Vk.jpg" class="w-12 h-12 rounded-full" alt="User">
+        <div>
+          <p class="text-white font-semibold">Group Chat</p>
+          <p class="text-sm text-white/70">Have a fun guys..</p>
         </div>
-        <div class="chatlist">
-            <div class="list">
-                <div class="header-chat">
-                    <div style="margin-left: 10px;">
-                        <h2>Chats</h2>
-                    </div>
-                    <div style="margin-right: 10px;">
-                        <i style="margin-right: 15px;" class="far fa-sticky-note"></i>
-                        <i class="fas fa-grip-lines"></i>
-                    </div>
-                </div>
-
-                <div class="search-chat">
-                    <input type="text" class="search" placeholder="Search Chats.." />
-                </div>
-
-                <div class="user-profile1">
-                    <div>
-                        <img src="Images/Vk.jpg" height="50" width="50" style="border-radius: 50%; padding: 5px;" alt="Profile">
-                    </div>
-                    <div class="user-content">
-                        <h4>+1 (226) 698-8218 (You)</h4>
-                        <p class="txt">...</p>
-                    </div>
-                </div>
-
-                <div class="user-profile">
-                    <div>
-                        <img src="Images/Vk.jpg" height="50" width="50" style="border-radius: 50%; padding: 5px;" alt="Profile">
-                    </div>
-                    <div class="user-content">
-                        <h4>Group Chat</h4>
-                        <p></p>
-                    </div>
-                </div>
-
-                <div class="user-profile1">
-                    <div>
-                        <img src="Images/Tata.jpeg" height="50" width="50" style="border-radius: 50%; padding: 5px;" alt="Profile">
-                    </div>
-                    <div class="user-content">
-                        <h4>Sir Ratan Tata</h4>
-                        <p class="txt">Hello Yash</p>
-                    </div>
-                </div>
-
-            </div>
-            <div class="chat">
-                <div class="header-chat-profile">
-                    <div class="user-chat-profile">
-                        <img src="Images/Vk.jpg" height="60" width="60" style="border-radius: 50%;" alt="Profile">
-                        <div class="name">
-                            <h3>Group Chat</h3>
-                            <p id="typing-indicator" class="type"></p>
-                        </div>
-                    </div>
-                    <div class="chat-content">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                </div>
-
-                <div class="msg">
-                    <ul id="messages"></ul>
-                </div>
-
-               
-
-                <div class="chat-box">
-                    <div>
-                       
-                        <form onsubmit="return sendMessage()">
-                            <i class="fas fa-smile"></i> 
-                            <i class="fas fa-paperclip"></i>    
-                            <input id="sender" placeholder="Your Name" autocomplete="off" hidden />
-                            <input id="message" placeholder="Type your message..." autocomplete="off" oninput="startTyping()" onblur="stopTyping()" />
-                    </div>
-                       
-                    <div>
-                        <button id="btn"><i class="fas fa-paper-plane"></i></button>
-                    </form>
-                    </div>
-                    
-                    
-                    
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
+
+    <!-- Chat Area -->
+    <div class="flex flex-col w-full md:w-2/3 h-full">
+
+      <!-- Header -->
+      <div class="flex justify-between items-center bg-white/20 p-4 rounded-t-3xl backdrop-blur-md">
+        <div class="flex items-center gap-4">
+          <img src="Images/Vk.jpg" class="w-12 h-12 rounded-full" alt="Profile">
+          <div>
+            <h3 class="text-white font-semibold text-lg" style="color: black;">Group Chat</h3>
+            <p id="typing-indicator" class="text-sm text-white/70 italic"></p>
+          </div>
+        </div>
+        <i class="fas fa-phone-alt text-white text-xl" style="color: black;"></i>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-white/10 backdrop-blur-lg">
+        <ul id="messages" class="flex flex-col space-y-2"></ul>
+      </div>
+
+      <!-- Input -->
+      <div class="bg-white/20 p-4 backdrop-blur-md rounded-b-3xl">
+        <form onsubmit="return sendMessage()" class="flex items-center gap-4">
+          <input id="sender" type="text" hidden />
+          <input id="message" type="text" style="color: black;" placeholder="Type your message..." autocomplete="off" oninput="startTyping()" onblur="stopTyping()" 
+            class="custom-input flex-1 px-4 py-2 rounded-full border border-white/30 bg-white/20 text-white placeholder-white/70 focus:outline-none" />
+          <button id="btn" class="text-white text-2xl hover:scale-110 transition"><i class="fas fa-paper-plane" style="color: black;"></i></button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const socket = io();
+    let typingTimer;
+    const typingTimeout = 1000;
+
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      const sender = document.getElementById('sender').value;
+
+      if (!sender) {
+        alert('Please enter your name.');
+        return false;
+      }
+
+      if (message.trim() === '') return false;
+
+      socket.emit('chat message', { sender, message });
+      clearTimeout(typingTimer);
+      document.getElementById('message').value = '';
+      document.getElementById('typing-indicator').textContent = '';
+      return false;
+    }
+
+    function startTyping() {
+      const message = document.getElementById('message').value;
+      const sender = document.getElementById('sender').value;
+      socket.emit('typing', { sender, message });
+      clearTimeout(typingTimer);
+    }
+
+    function stopTyping() {
+      const sender = document.getElementById('sender').value;
+      typingTimer = setTimeout(() => {
+        socket.emit('stop typing', sender);
+      }, typingTimeout);
+    }
+
+    socket.on('chat message', function (data) {
+      const messages = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.className = data.sender === document.getElementById('sender').value
+        ? 'self-end bg-green-500 text-white px-4 py-2 rounded-xl max-w-[70%]'
+        : 'self-start bg-white/50 text-black px-4 py-2 rounded-xl max-w-[70%]';
+      li.textContent = `${data.sender}: ${data.message}`;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    socket.on('typing', function (data) {
+      const typingIndicator = document.getElementById('typing-indicator');
+      typingIndicator.textContent = `${data.sender} is typing...`;
+    });
+
+    socket.on('stop typing', function () {
+      const typingIndicator = document.getElementById('typing-indicator');
+      typingIndicator.textContent = '';
+    });
+
+    window.onload = function () {
+      const storedSender = sessionStorage.getItem('sender');
+      const storedTime = sessionStorage.getItem('sessionTime');
+      const currentTime = new Date().getTime();
+
+      if (storedSender && storedTime && currentTime - storedTime < 30 * 60 * 1000) {
+        document.getElementById('sender').value = storedSender;
+      } else {
+        const sender = prompt('Please enter your name:');
+        if (sender) {
+          document.getElementById('sender').value = sender;
+          sessionStorage.setItem('sender', sender);
+          sessionStorage.setItem('sessionTime', currentTime);
+        }
+      }
+    };
+
+    socket.on('chat history', function (history) {
+  const messages = document.getElementById('messages');
+  history.forEach((data) => {
+    const li = document.createElement('li');
+    li.className = data.sender === document.getElementById('sender').value
+      ? 'self-end bg-green-500 text-white px-4 py-2 rounded-xl max-w-[70%]'
+      : 'self-start bg-white/50 text-black px-4 py-2 rounded-xl max-w-[70%]';
+    li.textContent = `${data.sender}: ${data.message}`;
+    messages.appendChild(li);
+  });
+  messages.scrollTop = messages.scrollHeight;
+});
+
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </body>
 </html>
